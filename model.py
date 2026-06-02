@@ -1,8 +1,9 @@
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
+import streamlit as st
 
+@st.cache_data
 def load_data(path):
     df = pd.read_csv(path)
     df["Date"] = pd.to_datetime(df["Date"], format="%m/%d/%Y")
@@ -13,6 +14,7 @@ def load_data(path):
     df["WeekOfYear"] = df["Date"].dt.isocalendar().week.astype(int)
     return df
 
+@st.cache_resource
 def train_model(df):
     models = {}
     features = ["Day", "Month", "Year", "DayOfWeek", "WeekOfYear"]
