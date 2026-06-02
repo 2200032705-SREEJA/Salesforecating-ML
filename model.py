@@ -15,11 +15,12 @@ def load_data(path):
     return df
 
 @st.cache_resource
-def train_model(_df):          # ← underscore prefix tells Streamlit: don't hash this arg
+def train_model_cached(path):
+    df = load_data(path)
     models = {}
     features = ["Day", "Month", "Year", "DayOfWeek", "WeekOfYear"]
-    for product in _df["Product line"].unique():
-        pdf = _df[_df["Product line"] == product].copy()
+    for product in df["Product line"].unique():
+        pdf = df[df["Product line"] == product].copy()
         daily = pdf.groupby(["Date", "Day", "Month", "Year", "DayOfWeek", "WeekOfYear"])["Sales"].sum().reset_index()
         X = daily[features]
         y = daily["Sales"]
@@ -27,6 +28,10 @@ def train_model(_df):          # ← underscore prefix tells Streamlit: don't ha
         model.fit(X, y)
         models[product] = model
     return models
+
+# Keep original name so app.py works without changes
+def train_model(df):
+    return train_model_cached("data/SuperMarket_Analysis.csv")
 
 def predict_future(model, product, start_date, days):
     future_dates = pd.date_range(start=start_date, periods=days)
