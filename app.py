@@ -34,6 +34,7 @@ future_days    = st.sidebar.slider("Forecast how many days ahead?", 7, 90, 30)
 start_date     = st.sidebar.date_input("Start forecast from", value=datetime.date.today())
 
 OUTPUT_OPTIONS = [
+    "🔀 Show All",
     "📊 Forecast Summary (KPIs)",
     "📈 Predicted Sales Over Time",
     "📊 Weekly Sales Forecast",
@@ -43,26 +44,26 @@ OUTPUT_OPTIONS = [
     "💡 Insights & Recommendations",
 ]
 
-# ── Header: title LEFT, output selector RIGHT ─────────────────────────────────
-hdr_left, hdr_right = st.columns([2, 1])
-with hdr_left:
-    st.title("🛒 Supermarket Sales Forecasting")
-    st.markdown("Predict future sales by product line using XGBoost ML model.")
-with hdr_right:
-    st.markdown("### 📤 Select Outputs to Display")
-    show_all = st.checkbox("Show All", value=True)
-    if show_all:
-        selected_outputs = OUTPUT_OPTIONS
-    else:
-        selected_outputs = st.multiselect(
-            "Choose sections:", OUTPUT_OPTIONS,
-            default=["📈 Predicted Sales Over Time"],
-        )
-    if not selected_outputs and not show_all:
-        st.warning("No outputs selected.")
+ALL_SECTIONS = OUTPUT_OPTIONS[1:]  # everything except "Show All"
+
+# ── Header: title + subtitle ──────────────────────────────────────────────────
+st.title("🛒 Supermarket Sales Forecasting")
+st.markdown("Predict future sales by product line using XGBoost ML model.")
+
+# ── Output selector below title ───────────────────────────────────────────────
+st.markdown("##### 📤 Select Output to Display")
+selected_output = st.radio(
+    label="",
+    options=OUTPUT_OPTIONS,
+    index=0,
+    horizontal=True,
+    label_visibility="collapsed",
+)
 
 def show(section):
-    return section in selected_outputs
+    if selected_output == "🔀 Show All":
+        return True
+    return selected_output == section
 
 st.markdown("---")
 
